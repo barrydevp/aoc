@@ -9,8 +9,9 @@ fn main() {
     let input = read_input("data/day1.txt");
     let dials = input.lines();
 
-    let mut pwd = 0i64;
-    let mut pos = 50;
+    let mut pwd1 = 0i32;
+    let mut pwd2 = 0i32;
+    let mut pos = 50i32;
 
     dials.for_each(|dial| {
         let dial_ch: Vec<char> = dial.chars().collect();
@@ -22,34 +23,27 @@ fn main() {
             .unwrap();
 
         if direction == 'R' {
-            if steps >= (100 - pos) {
-                pwd += 1 + ((steps - 100 + pos) / 100) as i64;
-                pos = (pos + steps) % 100;
-            } else {
-                pos += steps;
-            }
+            pwd2 += (pos + steps) / 100;
+            pos += steps;
         } else if direction == 'L' {
-            if steps >= pos {
-                pwd += 1 + ((steps - pos) / 100) as i64;
-                if pos == 0 {
-                    pwd -= 1;
-                }
-                pos = (pos - steps).rem_euclid(100);
-            } else {
-                pos -= steps;
-            }
+            // we rotate left, the normal circle logic goes backwards, which mean 0 1 2 3 becomes 0 99 98 97
+            // so that our pos is now in reverse => we take new pos = (100 - pos)
+            // also need to mod by 100 because we could be at pos = 0
+            pwd2 += ((100 - pos) % 100 + steps) / 100;
+            pos -= steps;
         }
 
         // println!("Dialing {}  {}  {}", direction, steps, pwd);
 
-        // pos = pos.rem_euclid(100);
-        //
-        // if pos == 0 {
-        //     pwd += 1;
-        // }
+        pos = pos.rem_euclid(100);
+
+        if pos == 0 {
+            pwd1 += 1;
+        }
 
         // println!("Dialing {}  {}  {}", direction, steps, pwd);
     });
 
-    println!("The password is: {}", pwd);
+    println!("First pwd is: {}", pwd1);
+    println!("Second pwd is: {}", pwd2);
 }
